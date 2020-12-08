@@ -84,4 +84,57 @@ class Category:
 
 
 def create_spend_chart(categories):
-    print("not yet implemented")
+    # calculate percentage spent
+    percentages = []
+    totalSpent = 0
+    catSpent = []
+    # get the amounts each category has spent
+    for i in range(0, len(categories)):
+        catSpent.append(0)
+        for item in categories[i].ledger:
+            if item["amount"] < 0.0:
+                catSpent[i] += item["amount"]
+        totalSpent += catSpent[i]
+    # calculate percentage of what all categories have spent in total
+    for p in range(0, len(catSpent)):
+        percentage = 100*catSpent[p]/totalSpent
+        percentage -= percentage%10
+        percentages.append(percentage)
+
+    # print everything
+    outStr = ""
+    # print diagram title
+    outStr += "Percentage spent by category\n"
+
+    # print diagram
+    for x in range(100, -10, -10):
+        outStr += "%3i| " % x
+        for i in range(0, len(categories)):
+            if percentages[i] >= x:
+                outStr += "o  "
+            else:
+                outStr += "   "
+        outStr += "\n"
+
+    # print seperator line
+    outStr += "    -"
+    for i in range(0, len(categories)):
+        outStr += "---"
+
+    # print labels
+    # get longest string of category.name
+    nameLength = 0
+    for category in categories:
+        if nameLength < len(category.name):
+            nameLength = len(category.name)
+    # print each line of labels
+    for i in range(0, nameLength):
+        outStr += "\n"
+        outStr += "     "
+        for category in categories:
+            if i < len(category.name):
+                outStr += category.name[i] + "  "
+            else:
+                outStr += "   "
+
+    return outStr
